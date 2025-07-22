@@ -1,18 +1,29 @@
 name: Upload Website
-on: push
+
+on: 
+  push
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    
     steps: 
       - name: Checkout code from repo
         uses: actions/checkout@v4
+        
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
+          # Create an IAM User with the policy AmazonS3FullAccess and create access keys
+
+          # Paste keys under Github repo > Settings > Secrets and variables > Actions > 
+          # New Repository Secret
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
+          aws-region: us-east-1  # Change the region if needed
+
       - name: Code static code to S3
+        # The name for this S3 bucket is 2025-07-22
         run: | 
           aws s3 sync ./ s3://2025-07-22/ \
             --exclude ".git*" \

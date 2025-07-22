@@ -1,0 +1,69 @@
+Step 1: S3
+
+Create a bucket with default settings
+
+Click on Permissions
+    Under Block public access (bucket settings), uncheck Block all public access 
+    Under Bucket Policy, paste this but change the BUCKET-NAME:
+        {
+            "Version": "2012-10-17",
+            "Statement": [
+                {
+                    "Sid": "Statement1",
+                    "Effect": "Allow",
+                    "Principal": "*",
+                    "Action": "s3:GetObject",
+                    "Resource": "arn:aws:s3:::BUCKET-NAME/*"
+                }
+            ]
+        }
+
+Click on Properties
+    Under Static website hosting, enable Static website hosting
+
+
+Step 2: IAM
+
+Create a user and directly attach the policy AmazonS3FullAccess 
+
+Click on the user > Security Credentials > Access Keys > Create access key
+Pick Command Line Interface (CLI) when creating the keys
+Hold onto the keys for the next step
+
+
+Step 3: Github
+
+Create a repository if you haven't already
+
+Under Settings > Secrets and variables > Actions > New Repository Secret,
+paste your keys with the names AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY
+
+Under Actions, click on "set up a workflow yourself", and paste this yml file,
+but change the BUCKET-NAME:
+
+    name: Upload Website
+
+    on: 
+    push
+
+    jobs:
+    deploy:
+        runs-on: ubuntu-latest
+        
+        steps: 
+        - name: Checkout code from repo
+            uses: actions/checkout@v4
+            
+        - name: Configure AWS Credentials
+            uses: aws-actions/configure-aws-credentials@v4
+            with:
+            aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            aws-region: us-east-1  # Change the region if needed
+
+        - name: Code static code to S3
+            # Change the BUCKET-NAME below
+            run: | 
+            aws s3 sync ./ s3://BUCKET-NAME/ \
+                --exclude ".git*" \
+                --exclude "README*" \
