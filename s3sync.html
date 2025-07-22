@@ -42,28 +42,28 @@ Under Actions, click on "set up a workflow yourself", and paste this yml file,
 but change the BUCKET-NAME:
 
     name: Upload Website
-
+    
     on: 
-    push
-
+      push
+    
     jobs:
-    deploy:
+      deploy:
         runs-on: ubuntu-latest
         
         steps: 
-        - name: Checkout code from repo
+          - name: Checkout code from repo
             uses: actions/checkout@v4
             
-        - name: Configure AWS Credentials
+          - name: Configure AWS Credentials
             uses: aws-actions/configure-aws-credentials@v4
             with:
-            aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-            aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-            aws-region: us-east-1  # Change the region if needed
-
-        - name: Code static code to S3
+              aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+              aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+              aws-region: us-east-1  # Change the region if needed
+    
+          - name: Code static code to S3
             # Change the BUCKET-NAME below
             run: | 
-            aws s3 sync ./ s3://BUCKET-NAME/ \
+              aws s3 sync ./ s3://BUCKET-NAME/ \
                 --exclude ".git*" \
                 --exclude "README*" \
